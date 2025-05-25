@@ -1,54 +1,26 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+1 중점 사항 확인
+a. 추상화: 비즈니스캔버스 개발팀은 인터페이스와 추상화를 중요하게 생각합니다. 지원자 분의 추상화 능력을 마음껏 보여주세요.
+b. CSS: 프론트엔드 개발자로서의 css 역량을 파악하고자 합니다. Figma로 제공된 UI와 동일한 UI를 만들어주세요.
+c. 개발 역량: 업무 처리 능력을 파악하기 위해 과제의 완성도와 작업 기간을 함께 검토합니다. 커밋 컨벤션은 따로 존재하지 않지만 지원자 분의 의도를 파악하기 쉽도록 작은 단위로 여러번 커밋해주세요.
+2 기술스택: React, Typescript, AntD 필수로 사용해야하며, 그 외 라이브러리는 자유롭게 활용 가능
+3 내용: 회원 목록을 관리할 수 있는 테이블을 만드는 것이 목표입니다.
+a. 회원 하나 하나의 데이터를 레코드(Record)라고 부릅니다.
+b.레코드를 이루고 있는 속성들을 필드(Field)라고 부릅니다.
+c. 필드
+i. 필드는 type, label, required로 이루어집니다.
+ii. type은 text, textarea, date, select, checkbox의 다섯 가지 값으로 이루어집니다. 1. text type은 20글자를 초과 할 수 없습니다. 2. textarea type은 50글자를 초과할 수 없습니다. 3. 위 정책은 커스텀 필드가 추가되어도 유지될 정책입니다.
+iii. 회원 레코드에는 총 6개의 기본 필드가 존재합니다. type, label, required 순으로 보면 아래와 같습니다. 1. text, '이름', true 2. text, '주소', false 3. textarea, '메모', false 4. date, '가입일', true 5. select, '직업', false
+a. 개발자
+b. PO
+c. 디자이너 6. checkbox, '이메일 수신 동의', false
+iv. 이후 위 정책들이 적용된 상태로, 사용자가 직접 type, label, required를 설정하여 생성, 수정, 삭제 할 수 있는 커스텀 필드 기능이 추가될 예정이라고 생각하고, 확장성 있게 코드를 작성해주세요.
+d. 레코드
+i. 레코드는 필드들의 조합입니다.
+ii. 레코드 목록을 테이블 형태로 볼 수 있어야 합니다. 1. 각 필드가 column으로 제공되야 합니다. 2. 필드별로 filtering 할 수 있어야 합니다.
+iii. 레코드를 추가할 수 있어야 합니다.
+iv. 레코드를 삭제할 수 있어야 합니다.
+v. 레코드를 수정할 수 있어야 합니다. 1. 레코드를 수정할 때, 필드 타입별로 다른 input이 떠야 합니다.
+vi. 초기 레코드는 이름, 주소, 메모, 가입일, 직업, 이메일 수신 동의 순으로 보면 아래와 같습니다. 1. Jonn Doe, 서울 강남구, 외국인, 2024-10-02, 개발자, true 2. Foo Bar, 서울 서초구, 한국인, 2024-10-01, PO, false
+e. 저장 기능
+i. 개발 서버를 켤 때, env로 STORAGE를 in-memory 또는 local-storage 로 설정 가능해야 합니다.
+ii. STORAGE를 local-storage로 설정한다면 레코드들이 로컬 스토리지에 저장되어야 합니다. 즉, 개발 서버를 껐다 켜거나 브라우저를 새로고침 해도 데이터가 보존되어야 합니다.
