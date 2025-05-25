@@ -1,39 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { Button, Modal } from 'antd';
+import { Layout } from 'antd';
+
+import { FieldList } from './components/FieldManager/FieldList';
 
 const App: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
-
   return (
-    <>
-      <Button type="primary" onClick={showModal}>
-        Open Modal
-      </Button>
-      <Modal
-        title="Basic Modal"
-        closable={{ 'aria-label': 'Custom Close Button' }}
-        open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-      </Modal>
-    </>
+    <Layout style={{ width: '100vw', height: '100vh' }}>
+      <FieldList />
+    </Layout>
   );
 };
 

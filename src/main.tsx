@@ -7,10 +7,13 @@ import 'antd/dist/reset.css';
 import '@ant-design/v5-patch-for-react-19';
 
 import App from './App.tsx';
+import { FieldManagerProvider } from './contexts/FieldManager.tsx';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <FieldManagerProvider>
+      <App />
+    </FieldManagerProvider>
   </StrictMode>,
 );
