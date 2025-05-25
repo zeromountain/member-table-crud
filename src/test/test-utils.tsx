@@ -1,17 +1,15 @@
-import type { ReactElement } from "react";
+import type { ReactElement } from 'react';
+
 import {
-  render as rtlRender,
   type RenderOptions,
+  fireEvent,
+  render as rtlRender,
   screen,
   within,
-  fireEvent,
-} from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-const customRender = (
-  ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
-) => {
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) => {
   return {
     user: userEvent.setup(),
     ...rtlRender(ui, { ...options }),

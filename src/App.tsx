@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Button, Modal } from "antd";
+import React, { useState } from 'react';
+
+import { Button, Modal } from 'antd';
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +24,7 @@ const App: React.FC = () => {
       </Button>
       <Modal
         title="Basic Modal"
-        closable={{ "aria-label": "Custom Close Button" }}
+        closable={{ 'aria-label': 'Custom Close Button' }}
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
