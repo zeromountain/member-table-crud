@@ -1,13 +1,11 @@
-import React from 'react';
-
 import { Layout } from 'antd';
 
-import { FieldList } from './components/FieldManager/FieldList';
+import TableView from './components/TableView';
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <Layout style={{ width: '100vw', height: '100vh' }}>
-      <FieldList />
+      <TableView />
     </Layout>
   );
 };
