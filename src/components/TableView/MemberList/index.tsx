@@ -9,43 +9,46 @@ import { MoreOutlined } from '@ant-design/icons';
 
 import { ActionButton } from '@/components/common/ActionButton';
 import { TableContainer } from '@/components/common/TableContainer';
+import { useMemberModal } from '@/hooks/useMemberModal';
+import type { Record as MemberRecord } from '@/utils/record';
 
 import { FilterDropdown } from './FilterDropdown';
+import { MemberFormModal } from './MemberFormModal';
 
-export interface Member {
+// Member 인터페이스를 Record 타입에 맞게 수정
+export interface Member extends Omit<MemberRecord, 'job' | 'emailSubscription'> {
   key: string;
-  name: string;
-  address: string;
-  memo: string;
-  joinDate: string;
-  position: string;
-  isReceivingEmails: boolean;
+  position: string; // job과 매핑
+  isReceivingEmails: boolean; // emailSubscription과 매핑
 }
 
-const data: Member[] = [
+const data: MemberRecord[] = [
   {
-    key: '1',
+    id: '123e4567-e89b-12d3-a456-426614174000',
     name: 'John Doe',
     address: '서울 강남구',
     memo: '외국인',
     joinDate: '2024-10-02',
-    position: '개발자',
-    isReceivingEmails: true,
+    job: '개발자',
+    emailSubscription: true,
   },
   {
-    key: '2',
+    id: '223e4567-e89b-12d3-a456-426614174001',
     name: 'Foo Bar',
     address: '서울 서구',
     memo: '한국인',
     joinDate: '2024-10-01',
-    position: 'PO',
-    isReceivingEmails: false,
+    job: 'PO',
+    emailSubscription: false,
   },
 ];
 
 export const MemberList = () => {
   const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  const { modalOpen, modalMode, editingMember, openEditModal, closeModal, handleModalSubmit } =
+    useMemberModal();
 
   const handleChange = (
     _pagination: TablePaginationConfig,
@@ -54,12 +57,7 @@ export const MemberList = () => {
     setFilteredInfo(filters);
   };
 
-  const handleEdit = (record: Member) => {
-    // TODO: 수정 기능 구현
-    console.log('Edit:', record);
-  };
-
-  const handleDelete = (record: Member) => {
+  const handleDelete = (record: MemberRecord) => {
     Modal.confirm({
       title: '회원 삭제',
       content: `${record.name} 회원을 삭제하시겠습니까?`,
@@ -72,11 +70,11 @@ export const MemberList = () => {
     });
   };
 
-  const getUniqueValues = (dataIndex: keyof Member) => {
+  const getUniqueValues = (dataIndex: keyof MemberRecord) => {
     return Array.from(new Set(data.map((item) => String(item[dataIndex]))));
   };
 
-  const columns: ColumnsType<Member> = [
+  const columns: ColumnsType<MemberRecord> = [
     {
       title: '이름',
       dataIndex: 'name',
@@ -90,11 +88,11 @@ export const MemberList = () => {
       dataIndex: 'address',
       key: 'address',
       filteredValue: filteredInfo.address || null,
-      onFilter: (value, record) => record.address.includes(value.toString()),
+      onFilter: (value, record) => record.address?.includes(value.toString()) || false,
       filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('address')} />,
     },
     {
-      title: '국적',
+      title: '메모',
       dataIndex: 'memo',
       key: 'memo',
       filteredValue: filteredInfo.memo || null,
@@ -111,24 +109,24 @@ export const MemberList = () => {
     },
     {
       title: '직업',
-      dataIndex: 'position',
-      key: 'position',
-      filteredValue: filteredInfo.position || null,
-      onFilter: (value, record) => record.position === value,
-      filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('position')} />,
+      dataIndex: 'job',
+      key: 'job',
+      filteredValue: filteredInfo.job || null,
+      onFilter: (value, record) => record.job === value,
+      filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('job')} />,
     },
     {
       title: '이메일 수신 동의',
-      dataIndex: 'isReceivingEmails',
-      key: 'isReceivingEmails',
-      filteredValue: filteredInfo.isReceivingEmails || null,
+      dataIndex: 'emailSubscription',
+      key: 'emailSubscription',
+      filteredValue: filteredInfo.emailSubscription || null,
       onFilter: (value, record) => {
-        if (value === '선택됨') return record.isReceivingEmails === true;
-        if (value === '선택 안함') return record.isReceivingEmails === false;
+        if (value === '선택됨') return record.emailSubscription === true;
+        if (value === '선택 안함') return record.emailSubscription === false;
         return false;
       },
       filterDropdown: (props) => <FilterDropdown {...props} values={['선택됨', '선택 안함']} />,
-      render: (isReceivingEmails: boolean) => <Checkbox checked={isReceivingEmails} />,
+      render: (emailSubscription: boolean) => <Checkbox checked={emailSubscription} />,
     },
     {
       key: 'actions',
@@ -140,7 +138,7 @@ export const MemberList = () => {
               {
                 key: 'edit',
                 label: '수정',
-                onClick: () => handleEdit(record),
+                onClick: () => openEditModal(record),
               },
               {
                 key: 'delete',
@@ -161,7 +159,7 @@ export const MemberList = () => {
 
   return (
     <TableContainer>
-      <Table<Member>
+      <Table<MemberRecord>
         columns={columns}
         dataSource={data}
         onChange={handleChange}
@@ -178,6 +176,13 @@ export const MemberList = () => {
           showSizeChanger: true,
           showQuickJumper: true,
         }}
+      />
+      <MemberFormModal
+        open={modalOpen}
+        mode={modalMode}
+        initialValues={editingMember}
+        onCancel={closeModal}
+        onSubmit={handleModalSubmit}
       />
     </TableContainer>
   );

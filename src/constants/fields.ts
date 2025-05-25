@@ -5,28 +5,28 @@ import type { FieldState } from '@/types/field';
 export const defaultFields: FieldState[] = [
   {
     id: uuidv4(),
-    type: 'TEXT',
+    type: 'text',
     label: '이름',
     required: true,
     value: '',
   },
   {
     id: uuidv4(),
-    type: 'SELECT',
+    type: 'select',
     label: '직무',
     required: true,
     value: '',
   },
   {
     id: uuidv4(),
-    type: 'DATE',
+    type: 'date',
     label: '입사일',
     required: true,
     value: '',
   },
   {
     id: uuidv4(),
-    type: 'TEXTAREA',
+    type: 'textarea',
     label: '메모',
     required: false,
     value: '',

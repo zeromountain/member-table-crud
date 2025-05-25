@@ -15,7 +15,7 @@ export const FieldManagerProvider = ({ children }: { children: React.ReactNode }
     const newField: FieldState = {
       ...field,
       id: uuidv4(),
-      value: field.type === 'CHECKBOX' ? false : '',
+      value: field.type === 'checkbox' ? false : '',
     };
     setFields((prev) => [...prev, newField]);
   };

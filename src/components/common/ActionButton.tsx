@@ -10,8 +10,8 @@ interface ActionButtonProps extends ButtonProps {
 
 export const ActionButton = styled(Button)<ActionButtonProps>`
   min-width: ${({ width }) => width || '73px'};
-  height: ${({ height }) => height || 'auto'};
-  padding: 4px 8px;
+  height: ${({ height }) => height || '32px'};
+  padding: 0 12px;
   border-radius: ${({ radius }) => radius || '12px'};
 
   &:focus {
