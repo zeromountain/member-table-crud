@@ -35,8 +35,8 @@ const saveToLocalStorage = (members: MemberRecord[]): void => {
 };
 
 // 회원 서비스 클래스
-class MemberService {
-  private members: MemberRecord[] = [];
+export class MemberService {
+  protected members: MemberRecord[] = [];
 
   constructor() {
     this.members = STORAGE === 'local-storage' ? loadFromLocalStorage() : [...defaultRecords];
