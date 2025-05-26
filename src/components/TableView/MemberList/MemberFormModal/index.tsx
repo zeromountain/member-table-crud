@@ -59,6 +59,17 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
         emailSubscription: false,
       });
     }
+
+    return () => {
+      reset({
+        name: '',
+        address: '',
+        memo: '',
+        job: undefined,
+        emailSubscription: false,
+        joinDate: undefined,
+      });
+    };
   }, [reset, initialValues]);
 
   const onSubmitHandler = handleSubmit(async (data) => {
@@ -72,21 +83,9 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
       if (mode === 'create') {
         // 신규 회원 추가
         await addMember(memberData);
-        console.log('회원이 추가되었습니다:', memberData);
-
-        // create 모드에서 폼 초기화
-        reset({
-          name: '',
-          address: '',
-          memo: '',
-          job: undefined,
-          emailSubscription: false,
-          joinDate: undefined,
-        });
       } else if (initialValues?.id) {
         // 기존 회원 수정
         await updateMember(initialValues.id, memberData);
-        console.log('회원이 수정되었습니다:', memberData);
       }
 
       // 모달 닫기
@@ -130,7 +129,7 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
                   rules={
                     field.required
                       ? {
-                          required: `${field.label}을(를) 입력해주세요`,
+                          required: `${field.label}은 필수값입니다.`,
                           maxLength: {
                             value: 20,
                             message: `${field.label}은(는) 20글자를 초과할 수 없습니다`,
@@ -192,7 +191,7 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
                   render={({ field: inputField }) => (
                     <DatePicker
                       {...inputField}
-                      style={{ width: '100%' }}
+                      style={{ width: '160px', height: '32px' }}
                       status={errors[fieldId] ? 'error' : ''}
                     />
                   )}
