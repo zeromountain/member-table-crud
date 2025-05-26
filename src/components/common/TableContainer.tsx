@@ -9,4 +9,8 @@ export const TableContainer = styled.div`
   .ant-table-tbody > tr > td.ant-table-selection-column {
     border-right: 1px solid #f0f0f0;
   }
+
+  .ant-table-wrapper .ant-table-pagination-right {
+    padding: 0 16px;
+  }
 `;

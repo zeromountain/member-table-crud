@@ -31,6 +31,7 @@ export const MemberList = ({
   setSelectedRowKeys: (keys: React.Key[]) => void;
 }) => {
   const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const { members, isLoading, error, fetchMembers, deleteMember } = useMemberStore();
   const { modalOpen, modalMode, editingMember, openEditModal, closeModal } = useMemberModal();
@@ -41,10 +42,15 @@ export const MemberList = ({
   }, [fetchMembers]);
 
   const handleChange = (
-    _pagination: TablePaginationConfig,
+    pagination: TablePaginationConfig,
     filters: Record<string, FilterValue | null>,
   ) => {
     setFilteredInfo(filters);
+
+    if (pagination.pageSize) {
+      setPageSize(pagination.pageSize);
+      // 페이지 크기가 변경되면 첫 페이지로 이동
+    }
   };
 
   const handleDelete = (record: MemberRecord) => {
@@ -169,9 +175,11 @@ export const MemberList = ({
         }}
         pagination={{
           total: members.length,
-          pageSize: 10,
+          pageSize: pageSize,
           showSizeChanger: true,
           showQuickJumper: true,
+          pageSizeOptions: ['10', '20', '50', '100'],
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
         }}
       />
       <MemberFormModal
