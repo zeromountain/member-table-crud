@@ -1,0 +1,119 @@
+import { v4 as uuidv4 } from 'uuid';
+
+import { STORAGE } from '@/config';
+import type { Record as MemberRecord } from '@/types/record';
+import { defaultRecords } from '@/types/record';
+
+// 로컬 스토리지 키
+const STORAGE_KEY = 'member-records';
+
+// 로컬 스토리지에서 데이터 불러오기
+const loadFromLocalStorage = (): MemberRecord[] => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      return parsed.state.members || defaultRecords;
+    }
+  } catch (error) {
+    console.error('로컬 스토리지에서 데이터 불러오기 실패:', error);
+  }
+  return defaultRecords;
+};
+
+// 로컬 스토리지에 데이터 저장
+const saveToLocalStorage = (members: MemberRecord[]): void => {
+  try {
+    const data = {
+      state: { members },
+      version: 0,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('로컬 스토리지에 데이터 저장 실패:', error);
+  }
+};
+
+// 회원 서비스 클래스
+class MemberService {
+  private members: MemberRecord[] = [];
+
+  constructor() {
+    this.members = STORAGE === 'local-storage' ? loadFromLocalStorage() : [...defaultRecords];
+  }
+
+  // 회원 목록 조회
+  async getMembers(): Promise<MemberRecord[]> {
+    return this.members;
+  }
+
+  // 회원 추가
+  async addMember(memberData: Omit<MemberRecord, 'id'>): Promise<MemberRecord> {
+    const newMember: MemberRecord = {
+      ...memberData,
+      id: uuidv4(),
+    };
+
+    this.members = [...this.members, newMember];
+
+    if (STORAGE === 'local-storage') {
+      saveToLocalStorage(this.members);
+    }
+
+    return newMember;
+  }
+
+  // 회원 수정
+  async updateMember(id: string, memberData: Partial<MemberRecord>): Promise<MemberRecord | null> {
+    const memberIndex = this.members.findIndex((member) => member.id === id);
+
+    if (memberIndex === -1) {
+      throw new Error('회원을 찾을 수 없습니다.');
+    }
+
+    const updatedMember = {
+      ...this.members[memberIndex],
+      ...memberData,
+    };
+
+    const updatedMembers = [...this.members];
+    updatedMembers[memberIndex] = updatedMember;
+    this.members = updatedMembers;
+
+    if (STORAGE === 'local-storage') {
+      saveToLocalStorage(this.members);
+    }
+
+    return updatedMember;
+  }
+
+  // 회원 삭제
+  async deleteMember(id: string): Promise<boolean> {
+    const originalLength = this.members.length;
+    this.members = this.members.filter((member) => member.id !== id);
+
+    if (this.members.length === originalLength) {
+      throw new Error('삭제할 회원을 찾을 수 없습니다.');
+    }
+
+    if (STORAGE === 'local-storage') {
+      saveToLocalStorage(this.members);
+    }
+
+    return true;
+  }
+
+  // 여러 회원 삭제
+  async deleteMultipleMembers(ids: string[]): Promise<boolean> {
+    this.members = this.members.filter((member) => !ids.includes(member.id));
+
+    if (STORAGE === 'local-storage') {
+      saveToLocalStorage(this.members);
+    }
+
+    return true;
+  }
+}
+
+// 싱글톤 인스턴스 생성
+export const memberService = new MemberService();

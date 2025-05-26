@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Checkbox, Dropdown, Modal, Table } from 'antd';
 
@@ -10,7 +10,8 @@ import { MoreOutlined } from '@ant-design/icons';
 import { ActionButton } from '@/components/common/ActionButton';
 import { TableContainer } from '@/components/common/TableContainer';
 import { useMemberModal } from '@/hooks/useMemberModal';
-import type { Record as MemberRecord } from '@/utils/record';
+import { useMemberStore } from '@/store/memberStore';
+import type { Record as MemberRecord } from '@/types/record';
 
 import { FilterDropdown } from './FilterDropdown';
 import { MemberFormModal } from './MemberFormModal';
@@ -22,33 +23,18 @@ export interface Member extends Omit<MemberRecord, 'job' | 'emailSubscription'> 
   isReceivingEmails: boolean; // emailSubscription과 매핑
 }
 
-const data: MemberRecord[] = [
-  {
-    id: '123e4567-e89b-12d3-a456-426614174000',
-    name: 'John Doe',
-    address: '서울 강남구',
-    memo: '외국인',
-    joinDate: '2024-10-02',
-    job: '개발자',
-    emailSubscription: true,
-  },
-  {
-    id: '223e4567-e89b-12d3-a456-426614174001',
-    name: 'Foo Bar',
-    address: '서울 서구',
-    memo: '한국인',
-    joinDate: '2024-10-01',
-    job: 'PO',
-    emailSubscription: false,
-  },
-];
-
 export const MemberList = () => {
   const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-  const { modalOpen, modalMode, editingMember, openEditModal, closeModal, handleModalSubmit } =
-    useMemberModal();
+  const { members, isLoading, error, fetchMembers, deleteMember, deleteMultipleMembers } =
+    useMemberStore();
+  const { modalOpen, modalMode, editingMember, openEditModal, closeModal } = useMemberModal();
+
+  // 컴포넌트 마운트 시 회원 목록 조회
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   const handleChange = (
     _pagination: TablePaginationConfig,
@@ -63,15 +49,37 @@ export const MemberList = () => {
       content: `${record.name} 회원을 삭제하시겠습니까?`,
       okText: '삭제',
       cancelText: '취소',
-      onOk: () => {
-        // TODO: 삭제 기능 구현
-        console.log('Delete:', record);
+      onOk: async () => {
+        try {
+          await deleteMember(record.id);
+        } catch (error) {
+          console.error('회원 삭제 중 오류가 발생했습니다:', error);
+        }
+      },
+    });
+  };
+
+  const handleDeleteSelected = () => {
+    if (!selectedRowKeys.length) return;
+
+    Modal.confirm({
+      title: '선택한 회원 삭제',
+      content: `선택한 ${selectedRowKeys.length}명의 회원을 삭제하시겠습니까?`,
+      okText: '삭제',
+      cancelText: '취소',
+      onOk: async () => {
+        try {
+          await deleteMultipleMembers(selectedRowKeys as string[]);
+          setSelectedRowKeys([]);
+        } catch (error) {
+          console.error('회원 일괄 삭제 중 오류가 발생했습니다:', error);
+        }
       },
     });
   };
 
   const getUniqueValues = (dataIndex: keyof MemberRecord) => {
-    return Array.from(new Set(data.map((item) => String(item[dataIndex]))));
+    return Array.from(new Set(members.map((item) => String(item[dataIndex] || ''))));
   };
 
   const columns: ColumnsType<MemberRecord> = [
@@ -159,10 +167,14 @@ export const MemberList = () => {
 
   return (
     <TableContainer>
+      {error && <div style={{ color: 'red', marginBottom: '16px' }}>{error}</div>}
+
       <Table<MemberRecord>
         columns={columns}
-        dataSource={data}
+        dataSource={members}
+        loading={isLoading}
         onChange={handleChange}
+        rowKey="id"
         rowSelection={{
           type: 'checkbox',
           selectedRowKeys,
@@ -171,7 +183,7 @@ export const MemberList = () => {
           },
         }}
         pagination={{
-          total: data.length,
+          total: members.length,
           pageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
@@ -182,7 +194,6 @@ export const MemberList = () => {
         mode={modalMode}
         initialValues={editingMember}
         onCancel={closeModal}
-        onSubmit={handleModalSubmit}
       />
     </TableContainer>
   );

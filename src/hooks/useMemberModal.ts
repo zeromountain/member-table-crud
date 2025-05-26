@@ -21,17 +21,6 @@ export const useMemberModal = () => {
     setModalOpen(false);
   };
 
-  const handleModalSubmit = (values: Omit<MemberRecord, 'id'>) => {
-    if (modalMode === 'create') {
-      // TODO: 추가 기능 구현
-      console.log('Create:', values);
-    } else {
-      // TODO: 수정 기능 구현
-      console.log('Edit:', { ...values, id: editingMember?.id });
-    }
-    closeModal();
-  };
-
   return {
     modalMode,
     modalOpen,
@@ -39,6 +28,5 @@ export const useMemberModal = () => {
     openCreateModal,
     openEditModal,
     closeModal,
-    handleModalSubmit,
   };
 };

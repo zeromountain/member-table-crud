@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 
 import { Controller, useForm } from 'react-hook-form';
 
-import { Checkbox, DatePicker, Input, Modal, Select } from 'antd';
+import { Checkbox, DatePicker, Input, Modal, Select, Typography } from 'antd';
 
+import { useMemberStore } from '@/store/memberStore';
 import type { Field } from '@/types/field';
 import { defaultFields } from '@/types/field';
 import type { Record as MemberRecord } from '@/types/record';
@@ -19,23 +20,17 @@ interface MemberFormModalProps {
   mode: 'create' | 'edit';
   initialValues?: MemberRecord;
   onCancel: () => void;
-  onSubmit: (values: Omit<MemberRecord, 'id'>) => void;
 }
 
-export const MemberFormModal = ({
-  open,
-  mode,
-  initialValues,
-  onCancel,
-  onSubmit,
-}: MemberFormModalProps) => {
+export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberFormModalProps) => {
   const [fields] = useState<Field[]>(defaultFields);
+  const { addMember, updateMember } = useMemberStore();
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isValid },
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -44,6 +39,7 @@ export const MemberFormModal = ({
       job: undefined,
       emailSubscription: false,
     },
+    mode: 'onChange',
   });
 
   useEffect(() => {
@@ -65,17 +61,38 @@ export const MemberFormModal = ({
     }
   }, [reset, initialValues]);
 
-  const onSubmitHandler = handleSubmit((data) => {
-    onSubmit({
-      ...data,
-      joinDate: data.joinDate.format('YYYY-MM-DD'),
-    });
+  const onSubmitHandler = handleSubmit(async (data) => {
+    try {
+      // joinDate를 문자열로 변환
+      const memberData = {
+        ...data,
+        joinDate: data.joinDate.format('YYYY-MM-DD'),
+      };
+
+      if (mode === 'create') {
+        // 신규 회원 추가
+        await addMember(memberData);
+        console.log('회원이 추가되었습니다:', memberData);
+      } else if (initialValues?.id) {
+        // 기존 회원 수정
+        await updateMember(initialValues.id, memberData);
+        console.log('회원이 수정되었습니다:', memberData);
+      }
+
+      // 모달 닫기
+      onCancel();
+    } catch (error) {
+      console.error('회원 처리 중 오류가 발생했습니다:', error);
+    }
   });
 
   // label과 input 간격을 위한 스타일
   const labelStyle = { marginBottom: '6px', display: 'block' };
   const formItemStyle = { marginBottom: '16px' };
   const requiredMark = <span style={{ color: '#ff4d4f', marginLeft: '4px' }}>*</span>;
+
+  // 버튼 비활성화 여부
+  const isButtonDisabled = mode === 'edit' ? !isDirty : !isValid;
 
   return (
     <Modal
@@ -84,7 +101,7 @@ export const MemberFormModal = ({
       onCancel={onCancel}
       onOk={onSubmitHandler}
       okText={mode === 'create' ? '추가' : '수정'}
-      okButtonProps={{ disabled: mode === 'edit' && !isDirty }}
+      okButtonProps={{ disabled: isButtonDisabled }}
       cancelText="취소"
     >
       <form>
@@ -165,7 +182,7 @@ export const MemberFormModal = ({
                   render={({ field: inputField }) => (
                     <DatePicker
                       {...inputField}
-                      width="100%"
+                      style={{ width: '100%' }}
                       status={errors[fieldId] ? 'error' : ''}
                     />
                   )}
@@ -221,7 +238,14 @@ export const MemberFormModal = ({
               )}
               {fieldInput}
               {errors[fieldId] && (
-                <span className="text-red-500 text-sm">{errors[fieldId]?.message}</span>
+                <Typography.Text
+                  type="danger"
+                  style={{
+                    fontSize: '12px',
+                  }}
+                >
+                  {errors[fieldId]?.message}
+                </Typography.Text>
               )}
             </div>
           );
