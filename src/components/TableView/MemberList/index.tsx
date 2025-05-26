@@ -23,12 +23,16 @@ export interface Member extends Omit<MemberRecord, 'job' | 'emailSubscription'> 
   isReceivingEmails: boolean; // emailSubscription과 매핑
 }
 
-export const MemberList = () => {
+export const MemberList = ({
+  selectedRowKeys,
+  setSelectedRowKeys,
+}: {
+  selectedRowKeys: React.Key[];
+  setSelectedRowKeys: (keys: React.Key[]) => void;
+}) => {
   const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
-  const { members, isLoading, error, fetchMembers, deleteMember, deleteMultipleMembers } =
-    useMemberStore();
+  const { members, isLoading, error, fetchMembers, deleteMember } = useMemberStore();
   const { modalOpen, modalMode, editingMember, openEditModal, closeModal } = useMemberModal();
 
   // 컴포넌트 마운트 시 회원 목록 조회
@@ -54,25 +58,6 @@ export const MemberList = () => {
           await deleteMember(record.id);
         } catch (error) {
           console.error('회원 삭제 중 오류가 발생했습니다:', error);
-        }
-      },
-    });
-  };
-
-  const handleDeleteSelected = () => {
-    if (!selectedRowKeys.length) return;
-
-    Modal.confirm({
-      title: '선택한 회원 삭제',
-      content: `선택한 ${selectedRowKeys.length}명의 회원을 삭제하시겠습니까?`,
-      okText: '삭제',
-      cancelText: '취소',
-      onOk: async () => {
-        try {
-          await deleteMultipleMembers(selectedRowKeys as string[]);
-          setSelectedRowKeys([]);
-        } catch (error) {
-          console.error('회원 일괄 삭제 중 오류가 발생했습니다:', error);
         }
       },
     });
