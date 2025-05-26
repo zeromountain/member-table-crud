@@ -73,6 +73,16 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
         // 신규 회원 추가
         await addMember(memberData);
         console.log('회원이 추가되었습니다:', memberData);
+
+        // create 모드에서 폼 초기화
+        reset({
+          name: '',
+          address: '',
+          memo: '',
+          job: undefined,
+          emailSubscription: false,
+          joinDate: undefined,
+        });
       } else if (initialValues?.id) {
         // 기존 회원 수정
         await updateMember(initialValues.id, memberData);
