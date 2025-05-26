@@ -30,6 +30,7 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
     control,
     handleSubmit,
     reset,
+    clearErrors,
     formState: { errors, isDirty, isValid },
   } = useForm<FormValues>({
     defaultValues: {
@@ -59,18 +60,7 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
         emailSubscription: false,
       });
     }
-
-    return () => {
-      reset({
-        name: '',
-        address: '',
-        memo: '',
-        job: undefined,
-        emailSubscription: false,
-        joinDate: undefined,
-      });
-    };
-  }, [reset, initialValues]);
+  }, [initialValues, reset]);
 
   const onSubmitHandler = handleSubmit(async (data) => {
     try {
@@ -95,6 +85,22 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
     }
   });
 
+  const handleCancel = () => {
+    // 폼 상태 초기화
+    reset({
+      name: '',
+      address: '',
+      memo: '',
+      job: undefined,
+      emailSubscription: false,
+      joinDate: undefined,
+    });
+    clearErrors();
+
+    // 부모 컴포넌트의 onCancel 호출
+    onCancel();
+  };
+
   // label과 input 간격을 위한 스타일
   const labelStyle = { marginBottom: '6px', display: 'block' };
   const formItemStyle = { marginBottom: '16px' };
@@ -107,7 +113,7 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
     <Modal
       title={mode === 'create' ? '회원 추가' : '회원 수정'}
       open={open}
-      onCancel={onCancel}
+      onCancel={handleCancel}
       onOk={onSubmitHandler}
       okText={mode === 'create' ? '추가' : '수정'}
       okButtonProps={{ disabled: isButtonDisabled }}
@@ -207,7 +213,7 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
                   render={({ field: inputField }) => (
                     <Select
                       {...inputField}
-                      style={{ width: '100%' }}
+                      style={{ width: '320px' }}
                       status={errors[fieldId] ? 'error' : ''}
                     >
                       {field.options?.map((option) => (
@@ -226,9 +232,7 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
                   name={fieldId}
                   control={control}
                   render={({ field: { value, onChange } }) => (
-                    <Checkbox checked={!!value} onChange={(e) => onChange(e.target.checked)}>
-                      {field.label}
-                    </Checkbox>
+                    <Checkbox checked={!!value} onChange={(e) => onChange(e.target.checked)} />
                   )}
                 />
               );
@@ -239,12 +243,10 @@ export const MemberFormModal = ({ open, mode, initialValues, onCancel }: MemberF
 
           return (
             <div key={field.id} style={formItemStyle}>
-              {field.type !== 'checkbox' && (
-                <label style={labelStyle}>
-                  {field.label}
-                  {field.required && requiredMark}
-                </label>
-              )}
+              <label style={labelStyle}>
+                {field.label}
+                {field.required && requiredMark}
+              </label>
               {fieldInput}
               {errors[fieldId] && (
                 <Typography.Text
