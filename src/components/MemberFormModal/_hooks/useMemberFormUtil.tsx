@@ -57,6 +57,7 @@ export const useMemberFormUtil = () => {
             render={({ field: inputField }) => (
               <Input
                 {...inputField}
+                placeholder={`${field.label} 입력`}
                 value={typeof inputField.value === 'string' ? inputField.value : ''}
                 status={errors[fieldId] ? 'error' : ''}
               />
@@ -70,6 +71,7 @@ export const useMemberFormUtil = () => {
             render={({ field: inputField }) => (
               <Input.TextArea
                 {...inputField}
+                placeholder="한국인 / 외국인"
                 value={typeof inputField.value === 'string' ? inputField.value : ''}
               />
             )}
@@ -96,6 +98,7 @@ export const useMemberFormUtil = () => {
               <Select
                 {...inputField}
                 style={{ width: '320px' }}
+                placeholder={`${field.label} 선택`}
                 status={errors[fieldId] ? 'error' : ''}
               >
                 {field.options?.map((option) => (
