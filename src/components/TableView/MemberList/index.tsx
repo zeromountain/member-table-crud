@@ -5,14 +5,13 @@ import { Modal, Table } from 'antd';
 import type { TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue } from 'antd/es/table/interface';
 
+import { MemberFormModal } from '@/components/MemberFormModal';
+import { useMemberColumns } from '@/components/TableView/MemberList/_hooks/useMemberColumns';
 import { TableContainer } from '@/components/common/TableContainer';
-import { useMemberColumns } from '@/hooks/useMemberColumns';
 import { useMemberModal } from '@/hooks/useMemberModal';
 import { useMemberStore } from '@/store/memberStore';
 import { defaultFields } from '@/types/field';
 import type { Record as MemberRecord, RecordWithCustomFields } from '@/types/record';
-
-import { MemberFormModal } from './MemberFormModal';
 
 // Member 인터페이스를 Record 타입에 맞게 수정
 export interface Member extends Omit<MemberRecord, 'job' | 'emailSubscription'> {
