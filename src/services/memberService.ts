@@ -3,36 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { STORAGE } from '@/config';
 import type { Record as MemberRecord } from '@/types/record';
 import { defaultRecords } from '@/types/record';
-
-// 로컬 스토리지 키
-const STORAGE_KEY = 'member-records';
-
-// 로컬 스토리지에서 데이터 불러오기
-const loadFromLocalStorage = (): MemberRecord[] => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      return parsed.state.members || defaultRecords;
-    }
-  } catch (error) {
-    console.error('로컬 스토리지에서 데이터 불러오기 실패:', error);
-  }
-  return defaultRecords;
-};
-
-// 로컬 스토리지에 데이터 저장
-const saveToLocalStorage = (members: MemberRecord[]): void => {
-  try {
-    const data = {
-      state: { members },
-      version: 0,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (error) {
-    console.error('로컬 스토리지에 데이터 저장 실패:', error);
-  }
-};
+import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/storage';
 
 // 회원 서비스 클래스
 export class MemberService {
