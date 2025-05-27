@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { DEFAULT_STORAGE } from '@/constants/storage';
 import { MemberService } from '@/services/memberService';
 import { defaultRecords } from '@/types/record';
 import type { Record as MemberRecord } from '@/types/record';
@@ -28,7 +29,7 @@ Object.defineProperty(window, 'localStorage', {
 
 // STORAGE 설정을 'local-storage'로 강제
 vi.mock('@/config', () => ({
-  STORAGE: 'local-storage',
+  STORAGE: DEFAULT_STORAGE,
 }));
 
 describe('MemberService', () => {

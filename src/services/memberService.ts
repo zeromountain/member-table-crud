@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { STORAGE } from '@/config';
+import { DEFAULT_STORAGE } from '@/constants/storage';
 import type { Record as MemberRecord } from '@/types/record';
 import { defaultRecords } from '@/types/record';
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/storage';
@@ -10,7 +11,7 @@ export class MemberService {
   protected members: MemberRecord[] = [];
 
   constructor() {
-    this.members = STORAGE === 'local-storage' ? loadFromLocalStorage() : [...defaultRecords];
+    this.members = STORAGE === DEFAULT_STORAGE ? loadFromLocalStorage() : [...defaultRecords];
   }
 
   // 회원 목록 조회
@@ -27,7 +28,7 @@ export class MemberService {
 
     this.members = [...this.members, newMember];
 
-    if (STORAGE === 'local-storage') {
+    if (STORAGE === DEFAULT_STORAGE) {
       saveToLocalStorage(this.members);
     }
 
@@ -51,7 +52,7 @@ export class MemberService {
     updatedMembers[memberIndex] = updatedMember;
     this.members = updatedMembers;
 
-    if (STORAGE === 'local-storage') {
+    if (STORAGE === DEFAULT_STORAGE) {
       saveToLocalStorage(this.members);
     }
 
@@ -67,7 +68,7 @@ export class MemberService {
       throw new Error('삭제할 회원을 찾을 수 없습니다.');
     }
 
-    if (STORAGE === 'local-storage') {
+    if (STORAGE === DEFAULT_STORAGE) {
       saveToLocalStorage(this.members);
     }
 
@@ -78,7 +79,7 @@ export class MemberService {
   async deleteMultipleMembers(ids: string[]): Promise<boolean> {
     this.members = this.members.filter((member) => !ids.includes(member.id));
 
-    if (STORAGE === 'local-storage') {
+    if (STORAGE === DEFAULT_STORAGE) {
       saveToLocalStorage(this.members);
     }
 
