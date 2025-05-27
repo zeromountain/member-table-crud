@@ -117,7 +117,7 @@ pnpm test
 - 로딩, 에러 상태 관리
 - 서비스 계층과 UI 계층 사이의 중개자 역할
 
-1. **UI Layer (Components)**
+3. **UI Layer (Components)**
 - `MemberList`: 회원 목록 표시 및 조회
 - `MemberFormModal`: 회원 추가/수정 폼
 - `useMemberModal`: 모달 상태 관리 훅
@@ -130,7 +130,7 @@ pnpm test
 - React Hook Form을 사용한 폼 상태 관리
 - 필드 타입에 따른 동적 입력 컴포넌트 렌더링
 
-1. **폼 필드 생성 로직**
+2. **폼 필드 생성 로직**
 ```tsx
 {fields.map((field) => {
   // 필드 타입에 따라 다른 컴포넌트 렌더링
@@ -156,12 +156,12 @@ pnpm test
 })}
 ```
 
-1. **유효성 검증**
+3. **유효성 검증**
 - 필수 필드 검증
 - 텍스트 길이 제한 (text: 20자, textarea: 50자)
 - 커스텀 에러 메시지
 
-1. **데이터 처리**
+4. **데이터 처리**
 - 추가 모드: `addMember` 호출
 - 수정 모드: `updateMember` 호출
 - 날짜 형식 변환 (dayjs → 문자열)
@@ -176,7 +176,7 @@ MemberList 컴포넌트
 → 데이터 반환 및 상태 업데이트
 ```
 
-1. **회원 추가**
+2. **회원 추가**
 ```
 MemberFormModal(mode: 'create') 
 → useMemberStore.addMember(data) 
@@ -185,7 +185,7 @@ MemberFormModal(mode: 'create')
 → 상태 업데이트
 ```
 
-1. **회원 수정**
+3. **회원 수정**
 ```
 MemberFormModal(mode: 'edit') 
 → useMemberStore.updateMember(id, data) 
@@ -194,7 +194,7 @@ MemberFormModal(mode: 'edit')
 → 상태 업데이트
 ```
 
-1. **회원 삭제**
+4. **회원 삭제**
 ```
 삭제 버튼 클릭 
 → Modal.confirm 
