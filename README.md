@@ -3,6 +3,87 @@
 ## 프로젝트 개요
 회원 정보를 관리하는 웹 애플리케이션입니다. 회원의 기본 정보와 커스텀 필드를 관리할 수 있으며, 로컬 스토리지를 활용한 데이터 영속성을 제공합니다.
 
+## 개발 가이드
+1. 환경 설정
+```bash
+pnpm install
+```
+
+2. 개발 서버 실행
+```bash
+pnpm dev
+```
+
+3. 테스트 실행
+```bash
+pnpm test
+```
+
+## 프로젝트 구조
+```
+📦src
+ ┣ 📂assets
+ ┃ ┗ 📜react.svg
+ ┣ 📂components
+ ┃ ┣ 📂MemberFormModal
+ ┃ ┃ ┣ 📂_hooks
+ ┃ ┃ ┃ ┗ 📜useMemberFormUtil.tsx
+ ┃ ┃ ┣ 📜index.tsx
+ ┃ ┃ ┗ 📜style.ts
+ ┃ ┣ 📂TableView
+ ┃ ┃ ┣ 📂MemberList
+ ┃ ┃ ┃ ┣ 📂_hooks
+ ┃ ┃ ┃ ┃ ┣ 📜useMemberColumns.tsx
+ ┃ ┃ ┃ ┃ ┗ 📜useMemberColumnsUtil.tsx
+ ┃ ┃ ┃ ┗ 📜index.tsx
+ ┃ ┃ ┣ 📂ViewHeader
+ ┃ ┃ ┃ ┣ 📜index.tsx
+ ┃ ┃ ┃ ┗ 📜styles.ts
+ ┃ ┃ ┗ 📜index.tsx
+ ┃ ┗ 📂common
+ ┃ ┃ ┣ 📂FilterDropdown
+ ┃ ┃ ┃ ┣ 📜index.tsx
+ ┃ ┃ ┃ ┗ 📜styles.ts
+ ┃ ┃ ┣ 📜ActionButton.tsx
+ ┃ ┃ ┣ 📜ErrorText.tsx
+ ┃ ┃ ┣ 📜Header.tsx
+ ┃ ┃ ┣ 📜TableContainer.tsx
+ ┃ ┃ ┗ 📜Title.tsx
+ ┣ 📂config
+ ┃ ┗ 📜index.ts
+ ┣ 📂constants
+ ┃ ┣ 📜fields.ts
+ ┃ ┣ 📜form.ts
+ ┃ ┗ 📜storage.ts
+ ┣ 📂contexts
+ ┃ ┗ 📜MemberModalContext.tsx
+ ┣ 📂hooks
+ ┃ ┗ 📜useMemberModal.ts
+ ┣ 📂services
+ ┃ ┣ 📂__tests__
+ ┃ ┃ ┗ 📜memberService.test.ts
+ ┃ ┗ 📜memberService.ts
+ ┣ 📂store
+ ┃ ┗ 📜memberStore.ts
+ ┣ 📂test
+ ┃ ┣ 📜setup.ts
+ ┃ ┗ 📜test-utils.tsx
+ ┣ 📂types
+ ┃ ┣ 📜field.ts
+ ┃ ┣ 📜form.ts
+ ┃ ┗ 📜record.ts
+ ┣ 📂utils
+ ┃ ┣ 📂__tests__
+ ┃ ┃ ┣ 📜field.test.ts
+ ┃ ┃ ┗ 📜record.test.ts
+ ┃ ┣ 📜field.ts
+ ┃ ┣ 📜record.ts
+ ┃ ┗ 📜storage.ts
+ ┣ 📜App.tsx
+ ┣ 📜main.tsx
+ ┗ 📜vite-env.d.ts
+ ```
+
 ## 기술 스택
 - React
 - TypeScript
@@ -129,65 +210,6 @@ MemberFormModal(mode: 'edit')
 - **Type Safety**: TypeScript를 활용한 엄격한 타입 검사
 - **Storage Flexibility**: 환경 설정에 따라 저장소 전환 가능
 
-## 프로젝트 구조
-```
-📦src
- ┣ 📂assets
- ┃ ┗ 📜react.svg
- ┣ 📂components
- ┃ ┣ 📂FieldManager
- ┃ ┃ ┣ 📜FieldForm.tsx
- ┃ ┃ ┗ 📜FieldList.tsx
- ┃ ┣ 📂TableView
- ┃ ┃ ┣ 📂MemberList
- ┃ ┃ ┃ ┣ 📂FilterDropdown
- ┃ ┃ ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┃ ┃ ┗ 📜styles.ts
- ┃ ┃ ┃ ┣ 📂MemberFormModal
- ┃ ┃ ┃ ┃ ┗ 📜index.tsx
- ┃ ┃ ┃ ┗ 📜index.tsx
- ┃ ┃ ┣ 📂ViewHeader
- ┃ ┃ ┃ ┣ 📜index.tsx
- ┃ ┃ ┃ ┗ 📜styles.ts
- ┃ ┃ ┗ 📜index.tsx
- ┃ ┗ 📂common
- ┃ ┃ ┣ 📜ActionButton.tsx
- ┃ ┃ ┣ 📜Header.tsx
- ┃ ┃ ┣ 📜TableContainer.tsx
- ┃ ┃ ┗ 📜Title.tsx
- ┣ 📂config
- ┃ ┗ 📜index.ts
- ┣ 📂constants
- ┃ ┗ 📜fields.ts
- ┣ 📂contexts
- ┃ ┣ 📜FieldManager.tsx
- ┃ ┗ 📜MemberModalContext.tsx
- ┣ 📂hooks
- ┃ ┣ 📜useFieldManager.ts
- ┃ ┗ 📜useMemberModal.ts
- ┣ 📂services
- ┃ ┣ 📂__tests__
- ┃ ┃ ┗ 📜memberService.test.ts
- ┃ ┗ 📜memberService.ts
- ┣ 📂store
- ┃ ┗ 📜memberStore.ts
- ┣ 📂test
- ┃ ┣ 📜setup.ts
- ┃ ┗ 📜test-utils.tsx
- ┣ 📂types
- ┃ ┣ 📜field.ts
- ┃ ┗ 📜record.ts
- ┣ 📂utils
- ┃ ┣ 📂__tests__
- ┃ ┃ ┣ 📜field.test.ts
- ┃ ┃ ┗ 📜record.test.ts
- ┃ ┣ 📜field.ts
- ┃ ┗ 📜record.ts
- ┣ 📜App.tsx
- ┣ 📜main.tsx
- ┗ 📜vite-env.d.ts
- ```
-
 ## 데이터 모델
 ### 회원 정보 (Member Record)
 ```ts
@@ -233,18 +255,3 @@ MemberFormModal(mode: 'edit')
   - local-storage: 회원 데이터를 로컬스토리지에 저장
   - in-memory: 회원 데이터를 메모리에 저장
 
-## 개발 가이드
-1. 환경 설정
-```bash
-pnpm install
-```
-
-2. 개발 서버 실행
-```bash
-pnpm dev
-```
-
-3. 테스트 실행
-```bash
-pnpm test
-```
