@@ -1,19 +1,17 @@
-import { useEffect, useState } from 'react';
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useState } from 'react';
 
-import { Checkbox, Dropdown, Modal, Table } from 'antd';
+import { Modal, Table } from 'antd';
 
-import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import type { TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue } from 'antd/es/table/interface';
 
-import { MoreOutlined } from '@ant-design/icons';
-
-import { ActionButton } from '@/components/common/ActionButton';
 import { TableContainer } from '@/components/common/TableContainer';
+import { useMemberColumns } from '@/hooks/useMemberColumns';
 import { useMemberModal } from '@/hooks/useMemberModal';
 import { useMemberStore } from '@/store/memberStore';
-import type { Record as MemberRecord } from '@/types/record';
+import { defaultFields } from '@/types/field';
+import type { Record as MemberRecord, RecordWithCustomFields } from '@/types/record';
 
-import { FilterDropdown } from './FilterDropdown';
 import { MemberFormModal } from './MemberFormModal';
 
 // Member 인터페이스를 Record 타입에 맞게 수정
@@ -28,13 +26,50 @@ export const MemberList = ({
   setSelectedRowKeys,
 }: {
   selectedRowKeys: React.Key[];
-  setSelectedRowKeys: (keys: React.Key[]) => void;
+  setSelectedRowKeys: Dispatch<SetStateAction<React.Key[]>>;
 }) => {
   const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
-  const [pageSize, setPageSize] = useState<number>(10);
 
   const { members, isLoading, error, fetchMembers, deleteMember } = useMemberStore();
   const { modalOpen, modalMode, editingMember, openEditModal, closeModal } = useMemberModal();
+
+  // 회원 데이터를 RecordWithCustomFields로 변환
+  const memberRecords = useMemo<RecordWithCustomFields[]>(() => {
+    // 회원 데이터가 없으면 빈 배열 반환
+    if (!members || members.length === 0) {
+      return [];
+    }
+
+    // 데이터 복사 및 변환
+    return members.map((member) => {
+      // member가 null이거나 undefined인 경우 처리
+      if (!member) return {} as RecordWithCustomFields;
+
+      // 깊은 복사를 통해 데이터 변환
+      const record: RecordWithCustomFields = { ...member };
+
+      // 필드가 undefined인 경우 빈 값으로 초기화
+      defaultFields.forEach((field) => {
+        if (record[field.id] === undefined) {
+          if (field.type === 'checkbox') {
+            record[field.id] = false;
+          } else if (field.type === 'date') {
+            record[field.id] = '';
+          } else {
+            record[field.id] = '';
+          }
+        }
+      });
+
+      return record;
+    });
+  }, [members]);
+
+  // 디버깅을 위한 로그
+  useEffect(() => {
+    console.log('Members:', members);
+    console.log('Member Records:', memberRecords);
+  }, [members, memberRecords]);
 
   // 컴포넌트 마운트 시 회원 목록 조회
   useEffect(() => {
@@ -42,15 +77,10 @@ export const MemberList = ({
   }, [fetchMembers]);
 
   const handleChange = (
-    pagination: TablePaginationConfig,
+    _pagination: TablePaginationConfig,
     filters: Record<string, FilterValue | null>,
   ) => {
     setFilteredInfo(filters);
-
-    if (pagination.pageSize) {
-      setPageSize(pagination.pageSize);
-      // 페이지 크기가 변경되면 첫 페이지로 이동
-    }
   };
 
   const handleDelete = (record: MemberRecord) => {
@@ -69,100 +99,16 @@ export const MemberList = ({
     });
   };
 
-  const getUniqueValues = (dataIndex: keyof MemberRecord) => {
-    return Array.from(new Set(members.map((item) => String(item[dataIndex] || ''))));
-  };
-
-  const columns: ColumnsType<MemberRecord> = [
-    {
-      title: '이름',
-      dataIndex: 'name',
-      key: 'name',
-      filteredValue: filteredInfo.name || null,
-      onFilter: (value, record) => record.name.includes(value.toString()),
-      filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('name')} />,
-    },
-    {
-      title: '주소',
-      dataIndex: 'address',
-      key: 'address',
-      filteredValue: filteredInfo.address || null,
-      onFilter: (value, record) => record.address?.includes(value.toString()) || false,
-      filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('address')} />,
-    },
-    {
-      title: '메모',
-      dataIndex: 'memo',
-      key: 'memo',
-      filteredValue: filteredInfo.memo || null,
-      onFilter: (value, record) => record.memo === value,
-      filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('memo')} />,
-    },
-    {
-      title: '가입일',
-      dataIndex: 'joinDate',
-      key: 'joinDate',
-      filteredValue: filteredInfo.joinDate || null,
-      onFilter: (value, record) => record.joinDate === value,
-      filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('joinDate')} />,
-    },
-    {
-      title: '직업',
-      dataIndex: 'job',
-      key: 'job',
-      filteredValue: filteredInfo.job || null,
-      onFilter: (value, record) => record.job === value,
-      filterDropdown: (props) => <FilterDropdown {...props} values={getUniqueValues('job')} />,
-    },
-    {
-      title: '이메일 수신 동의',
-      dataIndex: 'emailSubscription',
-      key: 'emailSubscription',
-      filteredValue: filteredInfo.emailSubscription || null,
-      onFilter: (value, record) => {
-        if (value === '선택됨') return record.emailSubscription === true;
-        if (value === '선택 안함') return record.emailSubscription === false;
-        return false;
-      },
-      filterDropdown: (props) => <FilterDropdown {...props} values={['선택됨', '선택 안함']} />,
-      render: (emailSubscription: boolean) => <Checkbox checked={emailSubscription} />,
-    },
-    {
-      key: 'actions',
-      width: 50,
-      render: (_, record) => (
-        <Dropdown
-          menu={{
-            items: [
-              {
-                key: 'edit',
-                label: '수정',
-                onClick: () => openEditModal(record),
-              },
-              {
-                key: 'delete',
-                label: '삭제',
-                danger: true,
-                onClick: () => handleDelete(record),
-              },
-            ],
-            style: { minWidth: 180 },
-          }}
-          trigger={['click']}
-        >
-          <ActionButton type="text" icon={<MoreOutlined />} width={32} height={32} radius="0px" />
-        </Dropdown>
-      ),
-    },
-  ];
+  // 커스텀 훅을 사용하여 컬럼 생성
+  const columns = useMemberColumns(filteredInfo, memberRecords, openEditModal, handleDelete);
 
   return (
     <TableContainer>
       {error && <div style={{ color: 'red', marginBottom: '16px' }}>{error}</div>}
 
-      <Table<MemberRecord>
+      <Table<RecordWithCustomFields>
         columns={columns}
-        dataSource={members}
+        dataSource={memberRecords}
         loading={isLoading}
         onChange={handleChange}
         rowKey="id"
@@ -174,12 +120,10 @@ export const MemberList = ({
           },
         }}
         pagination={{
-          total: members.length,
-          pageSize: pageSize,
+          total: memberRecords.length,
+          pageSize: 10,
           showSizeChanger: true,
           showQuickJumper: true,
-          pageSizeOptions: ['10', '20', '50', '100'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
         }}
       />
       <MemberFormModal

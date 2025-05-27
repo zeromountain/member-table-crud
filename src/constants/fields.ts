@@ -1,34 +1,38 @@
-import { v4 as uuidv4 } from 'uuid';
+type Field = {
+  type: string;
+  label: string;
+  required: boolean;
+};
 
-import type { FieldState } from '@/types/field';
-
-export const defaultFields: FieldState[] = [
+export const defaultFields: Field[] = [
   {
-    id: uuidv4(),
     type: 'text',
     label: '이름',
     required: true,
-    value: '',
   },
   {
-    id: uuidv4(),
-    type: 'select',
-    label: '직무',
-    required: true,
-    value: '',
+    type: 'text',
+    label: '주소',
+    required: false,
   },
   {
-    id: uuidv4(),
-    type: 'date',
-    label: '입사일',
-    required: true,
-    value: '',
-  },
-  {
-    id: uuidv4(),
     type: 'textarea',
     label: '메모',
     required: false,
-    value: '',
+  },
+  {
+    type: 'date',
+    label: '가입일',
+    required: true,
+  },
+  {
+    type: 'select',
+    label: '직업',
+    required: false,
+  },
+  {
+    type: 'checkbox',
+    label: '이메일 수신 동의',
+    required: false,
   },
 ];
