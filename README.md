@@ -9,12 +9,17 @@
 pnpm install
 ```
 
-2. 개발 서버 실행
+2. 환경변수 설정
+- .env.local 파일 생성
+- `VITE_STORAGE=local-storage` or `VITE_STORAGE=in-memory`
+- 환경변수 미설정시 `local-storage` 기본값으로 실행
+
+3. 개발 서버 실행
 ```bash
 pnpm dev
 ```
 
-3. 테스트 실행
+4. 테스트 실행
 ```bash
 pnpm test
 ```
